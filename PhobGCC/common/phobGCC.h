@@ -26,11 +26,11 @@ using std::max;
 #include "stick.h"
 #include "../extras/extras.h"
 
-#define BUILD_RELEASE
-//#define BUILD_DEV
+//#define BUILD_RELEASE
+#define BUILD_DEV
 
 //This is just an integer.
-#define SW_VERSION 31
+#define SW_VERSION 32
 
 ControlConfig _controls{
 	.aRemap = 1 << A_REMAP,
