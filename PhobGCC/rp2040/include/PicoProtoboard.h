@@ -5,6 +5,30 @@
 #define CLEANADC
 #endif //CLEANADC
 
+#ifndef SPI_ADC
+#define SPI_ADC
+#endif //SPI_ADC
+
+//#ifndef MCP3002
+//#define MCP3002
+//#endif //MCP3002
+
+#ifndef MCP3202
+#define MCP3202
+#endif //MCP3202
+
+#ifndef DPAD
+#define DPAD
+#endif //DPAD
+
+#ifndef ANALOG_TRIG
+#define ANALOG_TRIG
+#endif //ANALOG_TRIG
+
+#ifndef PHOBVISION
+#define PHOBVISION
+#endif //PHOBVISION
+
 //defining which pin is what
 //GPIO
 //TODO: these are all temporary

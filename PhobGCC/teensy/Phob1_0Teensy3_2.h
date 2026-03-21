@@ -9,6 +9,15 @@
 //Hardware-specific code for PhobGCC board revision 1.0 with a Teensy 3.2
 #define TEENSY3_2
 
+//Hardware-specific code for gamecube-function boards
+#ifndef DPAD
+#define DPAD
+#endif //DPAD
+
+#ifndef ANALOG_TRIG
+#define ANALOG_TRIG
+#endif //ANALOG_TRIG
+
 //defining which pin is what on the teensy
 const int _pinLa = 16;
 const int _pinRa = 23;

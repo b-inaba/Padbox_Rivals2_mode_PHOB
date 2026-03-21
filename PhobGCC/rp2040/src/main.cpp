@@ -48,12 +48,6 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 
 void second_core() {
 
-	gpio_set_function(_pinLED, GPIO_FUNC_PWM);
-	uint slice_num = pwm_gpio_to_slice_num(_pinLED);
-	pwm_set_wrap(slice_num, 255);
-	pwm_set_chan_level(slice_num, PWM_CHAN_B, 25);
-	pwm_set_enabled(slice_num, true);
-
 	extrasInit();
 
 
@@ -69,6 +63,7 @@ void second_core() {
 		static bool undoCal = false;
 
 
+#ifdef PHOBVISION
 		//when requested by the other core, commit the settings
 		if(_pleaseCommit != 0) {
 			if(_pleaseCommit == 1) {
@@ -686,6 +681,7 @@ void second_core() {
 				remapAdvance(_currentRemapStep, _controls, _hardware, _btn);
 			}
 		}
+#endif //PHOBVISION
 
 		//gpio_put(_pinSpare0, !gpio_get_out_level(_pinSpare0));
 		//pwm_set_gpio_level(_pinLED, 255*gpio_get_out_level(_pinSpare0));
@@ -751,7 +747,7 @@ void second_core() {
 		}
 
 		//read the controller's buttons
-		processButtons(_pinList, _btn, _hardware, _controls, _gains, _normGains, _currentCalStep, _currentRemapStep, _currentlyRaw, running, tempCalPointsX, tempCalPointsY, whichStick, notchStatus, notchAngles, measuredNotchAngles, _aStickParams, _cStickParams);
+		processButtons(_pinList, _btn, _hardware, _extraBtn, _controls, _gains, _normGains, _currentCalStep, _currentRemapStep, _currentlyRaw, running, tempCalPointsX, tempCalPointsY, whichStick, notchStatus, notchAngles, measuredNotchAngles, _aStickParams, _cStickParams);
 
 	}
 }
@@ -777,8 +773,10 @@ int main() {
 	setPinModes();
 
 	Pins pinList {//not actually necessary for any of the rp2040 read functions
+#ifdef ANALOG_TRIG
 		.pinLa = 0,
 		.pinRa = 0,
+#endif //ANALOG_TRIG
 		.pinL  = 0,
 		.pinR  = 0,
 		.pinAx = 0,
@@ -849,7 +847,7 @@ int main() {
 	initializeButtons(_pinList, _btn, _controls.lTrigInitial, _controls.rTrigInitial);
 
 	//Read buttons on startup to determine what mode to begin in
-	readButtons(_pinList, _hardware);
+	readButtons(_pinList, _hardware, _extraBtn);
 
 	if(_hardware.S) { //hold start on powerup for BOOTSEL
 		reset_usb_boot(0, 0);
@@ -860,19 +858,22 @@ int main() {
 		set_sys_clock_khz(1000*250, true);//overclock to 250 khz, to alleviate performance issues
 	}
 
-	//delay for 20 milliseconds, should help with cubstraption
+#ifdef PHOBVISION
+	//delay for 20 milliseconds, should help with cubstraption. only for mainline boards (which have phobvision)
 	const uint32_t lastMicros = micros();
 	bool toggle = false;
 	while(micros() - lastMicros < 20'000) {
 		gpio_put(_pinDac0, toggle);
 		toggle = !toggle;
 	}
+#endif //PHOBVISION
 
 	multicore_lockout_victim_init();
 
 	multicore_launch_core1(second_core);
 
 	//Run comms unless Z is held while plugging in
+#ifdef PHOBVISIOIN
 	if(_hardware.Z) {
 #ifdef BUILD_DEV
 		const int version = -SW_VERSION;
@@ -887,5 +888,12 @@ int main() {
 				_rumblePower,
 				buttonsToGCReport);
 	}
+#else //PHOBVISION
+	enterMode(_pinTX,
+			_pinRumble,
+			_pinBrake,
+			_rumblePower,
+			buttonsToGCReport);
+#endif //PHOBVISION
 
 }

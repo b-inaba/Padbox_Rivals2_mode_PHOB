@@ -76,8 +76,10 @@ struct ExtrasConfig{
 };
 
 struct Pins{
+#ifdef ANALOG_TRIG
 	int pinLa;
 	int pinRa;
+#endif //ANALOG_TRIG
 	int pinL;
 	int pinR;
 	int pinAx;
@@ -139,6 +141,20 @@ union Buttons{
 	};
 };
 
+struct ExtraButtons{
+#ifdef B0XXRIGHT
+	bool LS;
+	bool MS;
+	bool UP;
+#endif //B0XXRIGHT
+#ifdef CBUTTONS
+	bool Cl;
+	bool Cr;
+	bool Cd;
+	bool Cu;
+#endif //CBUTTONS
+};
+
 struct RawStick{
 	float axRaw;
 	float ayRaw;
@@ -162,10 +178,10 @@ struct Cardinals{
 };
 
 struct ControlConfig{
-	uint8_t aRemap;
+	uint8_t aRemap;//for B0XXRIGHT this is used for UP
 	uint8_t bRemap;
-	uint8_t dRemap;
-	uint8_t lRemap;
+	uint8_t dRemap;//for B0XXRIGHT this is used for MS
+	uint8_t lRemap;//for B0XXRIGHT this is used for LS
 	uint8_t rRemap;
 	uint8_t xRemap;
 	uint8_t yRemap;
@@ -221,10 +237,13 @@ struct ControlConfig{
 	const int waveshapingFactoryCX;
 	const int waveshapingFactoryCY;
 	int astickCardinalSnapping;
+	const int acardinalSnappingMin;
+	const int acardinalSnappingMax;
+	const int acardinalSnappingDefault;
 	int cstickCardinalSnapping;
-	const int cardinalSnappingMin;
-	const int cardinalSnappingMax;
-	const int cardinalSnappingDefault;
+	const int ccardinalSnappingMin;
+	const int ccardinalSnappingMax;
+	const int ccardinalSnappingDefault;
 	int astickAnalogScaler;
 	int cstickAnalogScaler;
 	const int analogScalerMin;
