@@ -773,10 +773,8 @@ int main() {
 	setPinModes();
 
 	Pins pinList {//not actually necessary for any of the rp2040 read functions
-#ifdef ANALOG_TRIG
 		.pinLa = 0,
 		.pinRa = 0,
-#endif //ANALOG_TRIG
 		.pinL  = 0,
 		.pinR  = 0,
 		.pinAx = 0,

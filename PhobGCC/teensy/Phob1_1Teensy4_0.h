@@ -10,13 +10,8 @@
 #define TEENSY4_0
 
 //Hardware-specific code for gamecube-function boards
-#ifndef DPAD
 #define DPAD
-#endif //DPAD
-
-#ifndef ANALOG_TRIG
 #define ANALOG_TRIG
-#endif //ANALOG_TRIG
 
 //defining which pin is what on the teensy
 const int _pinLa = 16;

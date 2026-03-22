@@ -76,10 +76,8 @@ struct ExtrasConfig{
 };
 
 struct Pins{
-#ifdef ANALOG_TRIG
 	int pinLa;
 	int pinRa;
-#endif //ANALOG_TRIG
 	int pinL;
 	int pinR;
 	int pinAx;
