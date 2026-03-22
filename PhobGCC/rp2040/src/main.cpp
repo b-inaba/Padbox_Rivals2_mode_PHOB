@@ -678,7 +678,7 @@ void second_core() {
 			} else if(_pleaseCommit == 10) {
 				//advance remap
 				_pleaseCommit = 255;
-				remapAdvance(_currentRemapStep, _controls, _hardware, _btn);
+				remapAdvance(_currentRemapStep, _controls, _hardware, _extraBtn, _btn);
 			}
 		}
 #endif //PHOBVISION
@@ -873,7 +873,7 @@ int main() {
 	multicore_launch_core1(second_core);
 
 	//Run comms unless Z is held while plugging in
-#ifdef PHOBVISIOIN
+#ifdef PHOBVISION
 	if(_hardware.Z) {
 #ifdef BUILD_DEV
 		const int version = -SW_VERSION;
