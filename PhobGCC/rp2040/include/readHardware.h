@@ -164,6 +164,11 @@ void setPinModes() {
 	gpio_init(_pinLED);
 	gpio_set_dir(_pinLED, GPIO_OUT);
 #endif //PINSPARE
+
+#ifdef LED_CHAIN
+	gpio_init(_pinLED);
+	gpio_set_dir(_pinLED, GPIO_OUT);
+#endif //LED_CHAIN
 }
 
 void readButtons(const Pins &, Buttons &hardware, ExtraButtons &extra) {

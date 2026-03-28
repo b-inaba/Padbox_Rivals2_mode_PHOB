@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "ws2812.h"
 #define CLEANADC
 
 //This is for the Arkodd Platform Padbox GS
@@ -52,6 +53,29 @@ const int _pinCxADC = -1;
 const int _pinCy = -1;
 const int _pinCyADC = -1;
 const int _pinRX = -1;
+
+#define NEOPIXEL_CHAIN
+#include <memory>
+#include "ws2812.h"
+const int _pinLED = 14;
+const int _ledCount = 13;
+void writeLED(WS2812 * neopixel, const int onlyPin = -1) {
+    if(onlyPin >=  0) {neopixel->clear();}
+    if(onlyPin < 0 || onlyPin ==  0) {neopixel->setPixelColor( 4, 90,  0,  0);}//left to right, top to bottom
+    if(onlyPin < 0 || onlyPin ==  1) {neopixel->setPixelColor( 5, 60, 30,  0);}
+    if(onlyPin < 0 || onlyPin ==  2) {neopixel->setPixelColor( 6, 30, 60,  0);}
+    if(onlyPin < 0 || onlyPin ==  3) {neopixel->setPixelColor( 7,  0, 90,  0);}
+    if(onlyPin < 0 || onlyPin ==  4) {neopixel->setPixelColor( 3,  0, 60, 30);}
+    if(onlyPin < 0 || onlyPin ==  5) {neopixel->setPixelColor( 2,  0, 30, 60);}
+    if(onlyPin < 0 || onlyPin ==  6) {neopixel->setPixelColor( 1,  0,  0, 90);}
+    if(onlyPin < 0 || onlyPin ==  7) {neopixel->setPixelColor( 0, 30,  0, 60);}
+    if(onlyPin < 0 || onlyPin ==  8) {neopixel->setPixelColor( 8,  0, 90,  0);}//a = green
+    if(onlyPin < 0 || onlyPin ==  9) {neopixel->setPixelColor( 9, 45, 45,  0);}//c buttons = yellow
+    if(onlyPin < 0 || onlyPin == 10) {neopixel->setPixelColor(10, 45, 45,  0);}
+    if(onlyPin < 0 || onlyPin == 11) {neopixel->setPixelColor(11, 45, 45,  0);}
+    if(onlyPin < 0 || onlyPin == 12) {neopixel->setPixelColor(12, 45, 45,  0);}
+    neopixel->show();
+}
 
 #include "debug.h"
 #include "readHardware.h"

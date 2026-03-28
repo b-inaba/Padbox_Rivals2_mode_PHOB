@@ -18,6 +18,9 @@ int _currentCalStep = -1;//-1 means not calibrating
 int _currentRemapStep = -1;//-1 means not remapping
 bool _currentlyRaw = false;
 DataCapture _dataCapture;
+#ifdef NEOPIXEL_CHAIN
+WS2812 * neopixel;
+#endif //NEOPIXEL_CHAIN
 
 //This gets called by the comms library
 GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
@@ -747,8 +750,16 @@ void second_core() {
 		}
 
 		//read the controller's buttons
+#ifdef NEOPIXEL_CHAIN
+		const int oldRemapStep = _currentRemapStep;
+#endif //NEOPIXEL_CHAIN
 		processButtons(_pinList, _btn, _hardware, _extraBtn, _controls, _gains, _normGains, _currentCalStep, _currentRemapStep, _currentlyRaw, running, tempCalPointsX, tempCalPointsY, whichStick, notchStatus, notchAngles, measuredNotchAngles, _aStickParams, _cStickParams);
 
+#ifdef NEOPIXEL_CHAIN
+		if(oldRemapStep != _currentRemapStep) {
+			writeLED(neopixel, _currentRemapStep);
+		}
+#endif //NEOPIXEL_CHAIN
 	}
 }
 
@@ -851,11 +862,6 @@ int main() {
 		reset_usb_boot(0, 0);
 	}
 
-	if(_hardware.Z) { //hold Z on powerup for PhobVision
-		_videoOut = true;
-		set_sys_clock_khz(1000*250, true);//overclock to 250 khz, to alleviate performance issues
-	}
-
 #ifdef PHOBVISION
 	//delay for 20 milliseconds, should help with cubstraption. only for mainline boards (which have phobvision)
 	const uint32_t lastMicros = micros();
@@ -866,6 +872,12 @@ int main() {
 	}
 #endif //PHOBVISION
 
+#ifdef NEOPIXEL_CHAIN
+	neopixel = new WS2812(_ledCount, _pinLED);
+	neopixel->begin();
+	writeLED(neopixel);
+#endif //NEOPIXEL_CHAIN
+
 	multicore_lockout_victim_init();
 
 	multicore_launch_core1(second_core);
@@ -873,6 +885,8 @@ int main() {
 	//Run comms unless Z is held while plugging in
 #ifdef PHOBVISION
 	if(_hardware.Z) {
+		_videoOut = true;
+		set_sys_clock_khz(1000*250, true);//overclock to 250 khz, to alleviate performance issues
 #ifdef BUILD_DEV
 		const int version = -SW_VERSION;
 #else //BUILD_DEV
