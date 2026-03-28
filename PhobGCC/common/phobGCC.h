@@ -2362,28 +2362,15 @@ void processButtons(Pins &pin, Buttons &btn, Buttons &hardware, ExtraButtons &ex
 		} else if(hardware.Z && hardware.S && hardware.Du && !hardware.A && !hardware.B && !hardware.X && !hardware.Y) {
 			settingChangeCount++;
 			changeTournamentToggle(btn, hardware, controls);
+#ifdef RUMBLE
 		} else if (hardware.A && hardware.B && hardware.Du) { //Increase Rumble
 			settingChangeCount++;
-#ifdef RUMBLE
 			changeRumble(INCREASE, btn, hardware, controls);
-#else // RUMBLE
-			//nothing
-			freezeSticks(2000, btn, hardware);
-#endif // RUMBLE
 		} else if (hardware.A && hardware.B && hardware.Dd) { //Decrease Rumble
 			settingChangeCount++;
-#ifdef RUMBLE
 			changeRumble(DECREASE, btn, hardware, controls);
-#else // RUMBLE
-			//nothing
-			freezeSticks(2000, btn, hardware);
-#endif // RUMBLE
 		} else if (hardware.A && hardware.B && hardware.S) { //Show current rumble setting
-			settingChangeCount++;
-#ifdef RUMBLE
 			showRumble(2000, btn, hardware, controls);
-#else // RUMBLE
-			freezeSticks(2000, btn, hardware);
 #endif // RUMBLE
 		} else if (hardware.A && hardware.X && hardware.Y && hardware.L) { //Analog Calibration
 			debug_println("Calibrating the A stick");
