@@ -894,11 +894,21 @@ int main() {
 		toggle = !toggle;
 	}
 #endif //PHOBVISION
-
 #ifdef NEOPIXEL_CHAIN
     neopixel = new WS2812(_ledCount, _pinLED);
     neopixel->begin();
-    writeLED(neopixel);
+
+    for(int i = 0; i < _ledCount; i++) {
+        if(_rivalsProfile) {
+            // Rivals 2 = green
+            neopixel->setPixelColor(i, 0, 40, 0);
+        } else {
+            // Melee = cobalt
+            neopixel->setPixelColor(i, 0, 25, 50);
+        }
+    }
+
+    neopixel->show();
 #endif //NEOPIXEL_CHAIN
 
 	multicore_lockout_victim_init();
