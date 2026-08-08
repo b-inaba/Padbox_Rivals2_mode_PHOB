@@ -17,6 +17,7 @@ volatile uint8_t _pleaseCommit = 0;//255 = redraw please
 int _currentCalStep = -1;//-1 means not calibrating
 int _currentRemapStep = -1;//-1 means not remapping
 bool _currentlyRaw = false;
+bool _rivalsProfile = false;
 DataCapture _dataCapture;
 #ifdef NEOPIXEL_CHAIN
 WS2812 * neopixel;
@@ -36,8 +37,8 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dDown   = _btn.Dd,
 		.dUp     = _btn.Du,
 		.z       = _btn.Z,
-		.r       = _btn.R,
-		.l       = _btn.L,
+		.r       = _rivalsProfile ? 0 : _btn.R,
+		.l       = _rivalsProfile ? (_btn.L || _btn.R) : _btn.L,
 		.pad1    = 1,
 		.xStick  = _btn.Ax,
 		.yStick  = _btn.Ay,
@@ -858,8 +859,12 @@ int main() {
 	//Read buttons on startup to determine what mode to begin in
 	readButtons(_pinList, _hardware, _extraBtn);
 
+	//Default = Melee
+	//Hold D-pad Right while plugging in = Rivals 2 profile
+	rivalsProfile = _hardware.Dr;
+
 	if(_hardware.S) { //hold start on powerup for BOOTSEL
-		reset_usb_boot(0, 0);
+   	 reset_usb_boot(0, 0);
 	}
 
 #ifdef PHOBVISION
