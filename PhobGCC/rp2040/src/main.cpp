@@ -896,22 +896,9 @@ int main() {
 #endif //PHOBVISION
 
 #ifdef NEOPIXEL_CHAIN
-	neopixel = new WS2812(_ledCount, _pinLED);
-	neopixel->begin();
-	  //Profile boot indicator
-    for(int i = 0; i < _ledCount; i++) {
-        if(_rivalsProfile) {
-            //Purple = Rivals 2
-            neopixel->setPixelColor(i, 35, 0, 35);
-        } else {
-            //Red = Melee
-            neopixel->setPixelColor(i, 50, 0, 0);
-        }
-    }
-    neopixel->show();
-
-    _profileIndicatorStart = millis();
-    _profileIndicatorActive = true;
+    neopixel = new WS2812(_ledCount, _pinLED);
+    neopixel->begin();
+    writeLED(neopixel);
 #endif //NEOPIXEL_CHAIN
 
 	multicore_lockout_victim_init();
