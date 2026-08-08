@@ -42,6 +42,7 @@ add_executable(phobgcc_rp2040
 	)
 
 target_sources(phobgcc_rp2040 PRIVATE
+    src/usb_phob_bridge.cpp
     ${pico_rectangle_SOURCE_DIR}/src/communication_protocols/usb.cpp
     ${pico_rectangle_SOURCE_DIR}/src/usb_configurations/gcc_to_usb_adapter.cpp
 )
