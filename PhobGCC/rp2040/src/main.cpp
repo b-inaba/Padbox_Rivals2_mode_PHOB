@@ -5,6 +5,9 @@
 #include "pico/multicore.h"
 #include "hardware/timer.h"
 #include "hardware/pwm.h"
+#include "hardware/regs/usb.h"
+#include "hardware/structs/usb.h"
+#include "hardware/resets.h"
 
 #include "phobGCC.h"
 #include "comms/joybus.hpp"
@@ -811,6 +814,53 @@ void second_core() {
 	}
 }
 
+bool usbHostPresent() {
+    // Start with a clean USB controller
+    reset_block(RESETS_RESET_USBCTRL_BITS);
+    unreset_block_wait(RESETS_RESET_USBCTRL_BITS);
+
+    // Connect RP2040 USB controller to its internal PHY
+    usb_hw->muxing =
+        USB_USB_MUXING_TO_PHY_BITS |
+        USB_USB_MUXING_SOFTCON_BITS;
+
+    // Pretend VBUS is present.
+    // We only care whether a real host responds on D+/D-.
+    usb_hw->pwr =
+        USB_USB_PWR_VBUS_DETECT_BITS |
+        USB_USB_PWR_VBUS_DETECT_OVERRIDE_EN_BITS;
+
+    // Enable USB device controller
+    usb_hw->main_ctrl =
+        USB_MAIN_CTRL_CONTROLLER_EN_BITS;
+
+    // Present ourselves as a full-speed USB device
+    usb_hw->sie_ctrl =
+        USB_SIE_CTRL_PULLUP_EN_BITS;
+
+    bool hostDetected = false;
+
+    absolute_time_t timeout = make_timeout_time_ms(500);
+
+    while (!time_reached(timeout)) {
+        if (usb_hw->sie_status & USB_SIE_STATUS_BUS_RESET_BITS) {
+            hostDetected = true;
+            break;
+        }
+    }
+
+    // Disconnect our temporary USB probe
+    usb_hw->sie_ctrl = 0;
+    usb_hw->main_ctrl = 0;
+
+    reset_block(RESETS_RESET_USBCTRL_BITS);
+
+    // Give the host a moment to see the temporary device disconnect
+    sleep_ms(20);
+
+    return hostDetected;
+}
+
 int main() {
 	//set the clock speed to 125 kHz
 	//the comms library needs this clockspeed
@@ -910,13 +960,6 @@ int main() {
 //Hold D-pad Right while plugging in = Rivals 2 profile
 _rivalsProfile = _hardware.Dr;
 
-// Detect whether USB-C is supplying power
-gpio_init(USB_POWER_PIN);
-gpio_set_dir(USB_POWER_PIN, GPIO_IN);
-gpio_pull_down(USB_POWER_PIN);
-sleep_us(100);
-
-bool usbConnected = gpio_get(USB_POWER_PIN);
 
 if(_hardware.S) {
     reset_usb_boot(0, 0);
@@ -971,17 +1014,17 @@ if(_hardware.S) {
 				buttonsToGCReport);
 	}
 #else //PHOBVISION
-    if(usbConnected) {
-        // USB-C connected: emulate a WUP-028 GameCube adapter
-        enterPhobUsbMode(buttonsToPhobUsbReport);
-    } else {
-        // No USB-C: use native GameCube Joybus
-        enterMode(_pinTX,
-                _pinRumble,
-                _pinBrake,
-                _rumblePower,
-                buttonsToGCReport);
-    }
+    if(usbHostPresent()) {
+    // PC is actually responding over USB
+    enterPhobUsbMode(buttonsToPhobUsbReport);
+} else {
+    // No USB host responded, so use native GameCube Joybus
+    enterMode(_pinTX,
+            _pinRumble,
+            _pinBrake,
+            _rumblePower,
+            buttonsToGCReport);
+}
 #endif //PHOBVISION
 
 }
