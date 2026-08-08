@@ -61,19 +61,19 @@ const int _pinLED = 14;
 const int _ledCount = 13;
 void writeLED(WS2812 * neopixel, const int onlyPin = -1) {
     if(onlyPin >=  0) {neopixel->clear();}
-    if(onlyPin < 0 || onlyPin ==  0) {neopixel->setPixelColor( 4, 0, 85, 170);}//left to right, top to bottom
-    if(onlyPin < 0 || onlyPin ==  1) {neopixel->setPixelColor( 5, 0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  2) {neopixel->setPixelColor( 6, 0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  3) {neopixel->setPixelColor( 7,  0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  4) {neopixel->setPixelColor( 3,  0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  5) {neopixel->setPixelColor( 2,  0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  6) {neopixel->setPixelColor( 1,  0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  7) {neopixel->setPixelColor( 0, 0, 85, 170);}
-    if(onlyPin < 0 || onlyPin ==  8) {neopixel->setPixelColor( 8,  0, 85, 170);}//a = green
-    if(onlyPin < 0 || onlyPin ==  9) {neopixel->setPixelColor( 9, 0, 85, 170);}//c buttons = yellow
-    if(onlyPin < 0 || onlyPin == 10) {neopixel->setPixelColor(10, 0, 85, 170);}
-    if(onlyPin < 0 || onlyPin == 11) {neopixel->setPixelColor(11, 0, 85, 170);}
-    if(onlyPin < 0 || onlyPin == 12) {neopixel->setPixelColor(12, 0, 85, 170);}
+    if(onlyPin < 0 || onlyPin ==  0) {neopixel->setPixelColor( 4, 0, 25,50);}//left to right, top to bottom
+    if(onlyPin < 0 || onlyPin ==  1) {neopixel->setPixelColor( 5, 0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  2) {neopixel->setPixelColor( 6, 0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  3) {neopixel->setPixelColor( 7,  0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  4) {neopixel->setPixelColor( 3,  0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  5) {neopixel->setPixelColor( 2,  0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  6) {neopixel->setPixelColor( 1,  0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  7) {neopixel->setPixelColor( 0, 0, 25,50);}
+    if(onlyPin < 0 || onlyPin ==  8) {neopixel->setPixelColor( 8,  0, 25,50);}//a = green
+    if(onlyPin < 0 || onlyPin ==  9) {neopixel->setPixelColor( 9, 0, 25,50);}//c buttons = yellow
+    if(onlyPin < 0 || onlyPin == 10) {neopixel->setPixelColor(10, 0, 25,50);}
+    if(onlyPin < 0 || onlyPin == 11) {neopixel->setPixelColor(11, 0, 25,50);}
+    if(onlyPin < 0 || onlyPin == 12) {neopixel->setPixelColor(12, 0, 25,50);}
     neopixel->show();
 }
 
