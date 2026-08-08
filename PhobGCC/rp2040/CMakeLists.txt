@@ -5,6 +5,19 @@ include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 project(phobgcc_rp2040 CXX C ASM)
 
 pico_sdk_init()
+include(FetchContent)
+
+FetchContent_Declare(
+    pico_rectangle
+    GIT_REPOSITORY https://github.com/JulienBernard3383279/pico-rectangle.git
+    GIT_TAG master
+)
+
+FetchContent_GetProperties(pico_rectangle)
+
+if(NOT pico_rectangle_POPULATED)
+    FetchContent_Populate(pico_rectangle)
+endif()
 
 set(CMAKE_CXX_FLAGS "-O3 -mcpu=cortex-m0plus -mthumb")
 
@@ -27,6 +40,16 @@ add_executable(phobgcc_rp2040
 	src/storage.cpp
 	src/games/ping.cpp
 	)
+
+target_sources(phobgcc_rp2040 PRIVATE
+    src/usb_phob_bridge.cpp
+    ${pico_rectangle_SOURCE_DIR}/src/communication_protocols/usb.cpp
+    ${pico_rectangle_SOURCE_DIR}/src/usb_configurations/gcc_to_usb_adapter.cpp
+)
+
+target_include_directories(phobgcc_rp2040 PRIVATE
+    ${pico_rectangle_SOURCE_DIR}/include
+)
 
 pico_generate_pio_header(phobgcc_rp2040 ${CMAKE_CURRENT_LIST_DIR}/pio/joybus.pio)
 pico_generate_pio_header(phobgcc_rp2040 ${CMAKE_CURRENT_LIST_DIR}/pio/cvideo.pio)
@@ -67,7 +90,9 @@ target_link_libraries(phobgcc_rp2040
 	hardware_pwm
 	hardware_spi
 	hardware_sync
-	hardware_timer)
+	hardware_timer
+	hardware_resets
+	hardware_irq)
 
 pico_add_extra_outputs(phobgcc_rp2040)
-pico_enable_stdio_usb(phobgcc_rp2040 1)
+pico_enable_stdio_usb(phobgcc_rp2040 0)
