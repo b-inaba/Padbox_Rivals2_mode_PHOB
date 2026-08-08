@@ -21,6 +21,8 @@ bool _rivalsProfile = false;
 DataCapture _dataCapture;
 #ifdef NEOPIXEL_CHAIN
 WS2812 * neopixel;
+bool _profileIndicatorActive = false;
+uint32_t _profileIndicatorStart = 0;
 #endif //NEOPIXEL_CHAIN
 
 //This gets called by the comms library
@@ -51,11 +53,27 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 }
 
 void second_core() {
+	#ifdef NEOPIXEL_CHAIN
+    //Return to normal cobalt LEDs after profile indicator
+    if(_profileIndicatorActive &&
+       (millis() - _profileIndicatorStart >= 600)) {
+        writeLED(neopixel);
+        _profileIndicatorActive = false;
+    }
+#endif //NEOPIXEL_CHAIN
 
 	extrasInit();
 
 
 	while(true) { //main event loop
+		#ifdef NEOPIXEL_CHAIN
+    //Return to normal cobalt LEDs after profile indicator
+    if(_profileIndicatorActive &&
+       (millis() - _profileIndicatorStart >= 600)) {
+        writeLED(neopixel);
+        _profileIndicatorActive = false;
+    }
+#endif //NEOPIXEL_CHAIN
 		//Set up persistent storage for calibration
 		static float tempCalPointsX[_noOfCalibrationPoints];
 		static float tempCalPointsY[_noOfCalibrationPoints];
@@ -880,7 +898,20 @@ int main() {
 #ifdef NEOPIXEL_CHAIN
 	neopixel = new WS2812(_ledCount, _pinLED);
 	neopixel->begin();
-	writeLED(neopixel);
+	  //Profile boot indicator
+    for(int i = 0; i < _ledCount; i++) {
+        if(_rivalsProfile) {
+            //Purple = Rivals 2
+            neopixel->setPixelColor(i, 35, 0, 35);
+        } else {
+            //Red = Melee
+            neopixel->setPixelColor(i, 50, 0, 0);
+        }
+    }
+    neopixel->show();
+
+    _profileIndicatorStart = millis();
+    _profileIndicatorActive = true;
 #endif //NEOPIXEL_CHAIN
 
 	multicore_lockout_victim_init();
