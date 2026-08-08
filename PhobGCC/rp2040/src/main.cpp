@@ -1,3 +1,4 @@
+#include "global.hpp"
 #include "usb_phob_bridge.hpp"
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
@@ -906,12 +907,20 @@ int main() {
 	readButtons(_pinList, _hardware, _extraBtn);
 
 	//Default = Melee
-	//Hold D-pad Right while plugging in = Rivals 2 profile
-	_rivalsProfile = _hardware.Dr;
+//Hold D-pad Right while plugging in = Rivals 2 profile
+_rivalsProfile = _hardware.Dr;
 
-	if(_hardware.S) { //hold start on powerup for BOOTSEL
-   	 reset_usb_boot(0, 0);
-	}
+// Detect whether USB-C is supplying power
+gpio_init(USB_POWER_PIN);
+gpio_set_dir(USB_POWER_PIN, GPIO_IN);
+gpio_pull_down(USB_POWER_PIN);
+sleep_us(100);
+
+bool usbConnected = gpio_get(USB_POWER_PIN);
+
+if(_hardware.S) {
+    reset_usb_boot(0, 0);
+}
 
 #ifdef PHOBVISION
 	//delay for 20 milliseconds, should help with cubstraption. only for mainline boards (which have phobvision)
@@ -962,7 +971,17 @@ int main() {
 				buttonsToGCReport);
 	}
 #else //PHOBVISION
-	enterPhobUsbMode(buttonsToPhobUsbReport);
+    if(usbConnected) {
+        // USB-C connected: emulate a WUP-028 GameCube adapter
+        enterPhobUsbMode(buttonsToPhobUsbReport);
+    } else {
+        // No USB-C: use native GameCube Joybus
+        enterMode(_pinTX,
+                _pinRumble,
+                _pinBrake,
+                _rumblePower,
+                buttonsToGCReport);
+    }
 #endif //PHOBVISION
 
 }
