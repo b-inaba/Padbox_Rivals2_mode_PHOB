@@ -1,3 +1,4 @@
+#include "usb_phob_bridge.hpp"
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
 #include "pico/multicore.h"
@@ -50,6 +51,33 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.analogR = _btn.Ra
 	}};
 	return report;
+}
+
+void buttonsToPhobUsbReport(PhobUsbReport* out) {
+    GCReport g = buttonsToGCReport();
+
+    out->a = g.a;
+    out->b = g.b;
+    out->x = g.x;
+    out->y = g.y;
+    out->start = g.start;
+
+    out->dLeft = g.dLeft;
+    out->dRight = g.dRight;
+    out->dDown = g.dDown;
+    out->dUp = g.dUp;
+
+    out->z = g.z;
+    out->r = g.r;
+    out->l = g.l;
+
+    out->xStick = g.xStick;
+    out->yStick = g.yStick;
+    out->cxStick = g.cxStick;
+    out->cyStick = g.cyStick;
+
+    out->analogL = g.analogL;
+    out->analogR = g.analogR;
 }
 
 void second_core() {
@@ -934,11 +962,7 @@ int main() {
 				buttonsToGCReport);
 	}
 #else //PHOBVISION
-	enterMode(_pinTX,
-			_pinRumble,
-			_pinBrake,
-			_rumblePower,
-			buttonsToGCReport);
+	enterPhobUsbMode(buttonsToPhobUsbReport);
 #endif //PHOBVISION
 
 }
