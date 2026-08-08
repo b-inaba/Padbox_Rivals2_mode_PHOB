@@ -37,7 +37,7 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dLeft   = _btn.Dl,
 		.dRight  = _btn.Dr,
 		.dDown   = _btn.Dd,
-		.dUp     = _btn.Du,
+		.dUp = _btn.Du && _extraBtn.UP,
 		.z       = _btn.Z,
 		.r       = _rivalsProfile ? 0 : _btn.R,
 		.l       = _rivalsProfile ? (_btn.L || _btn.R) : _btn.L,
