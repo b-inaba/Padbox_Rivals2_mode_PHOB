@@ -861,7 +861,7 @@ int main() {
 
 	//Default = Melee
 	//Hold D-pad Right while plugging in = Rivals 2 profile
-	rivalsProfile = _hardware.Dr;
+	_rivalsProfile = _hardware.Dr;
 
 	if(_hardware.S) { //hold start on powerup for BOOTSEL
    	 reset_usb_boot(0, 0);
