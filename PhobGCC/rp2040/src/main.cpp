@@ -23,6 +23,8 @@ int _currentCalStep = -1;//-1 means not calibrating
 int _currentRemapStep = -1;//-1 means not remapping
 bool _currentlyRaw = false;
 bool _rivalsProfile = false;
+const int _pinDpadToggle = 20;
+volatile bool _dpadUpUnlocked = false;
 DataCapture _dataCapture;
 #ifdef NEOPIXEL_CHAIN
 WS2812 * neopixel;
@@ -42,7 +44,7 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dLeft   = _btn.Dl,
 		.dRight  = _btn.Dr,
 		.dDown   = _btn.Dd,
-		.dUp = _btn.Du && _extraBtn.UP,
+		.dUp = _btn.Du && (_extraBtn.UP || _dpadUpUnlocked),
 		.z       = _btn.Z,
 		.r       = _rivalsProfile ? 0 : _btn.R,
 		.l       = _rivalsProfile ? (_btn.L || _btn.R) : _btn.L,
@@ -95,6 +97,8 @@ void second_core() {
 #endif //NEOPIXEL_CHAIN
 
 	extrasInit();
+	bool lastDpadTogglePressed = false;
+	uint64_t lastDpadToggleTime = 0;
 
 
 	while(true) { //main event loop
@@ -806,10 +810,24 @@ void second_core() {
 #endif //NEOPIXEL_CHAIN
 		processButtons(_pinList, _btn, _hardware, _extraBtn, _controls, _gains, _normGains, _currentCalStep, _currentRemapStep, _currentlyRaw, running, tempCalPointsX, tempCalPointsY, whichStick, notchStatus, notchAngles, measuredNotchAngles, _aStickParams, _cStickParams);
 
+// Toggle whether D-pad Up requires the K4 modifier
+bool dpadTogglePressed = !gpio_get(_pinDpadToggle);
+uint64_t now = millis();
+
+if(dpadTogglePressed &&
+   !lastDpadTogglePressed &&
+   (now - lastDpadToggleTime > 50)) {
+
+    _dpadUpUnlocked = !_dpadUpUnlocked;
+    lastDpadToggleTime = now;
+}
+
+lastDpadTogglePressed = dpadTogglePressed;
+
 #ifdef NEOPIXEL_CHAIN
-		if(oldRemapStep != _currentRemapStep) {
-			writeLED(neopixel, _currentRemapStep);
-		}
+    if(oldRemapStep != _currentRemapStep) {
+        writeLED(neopixel, _currentRemapStep);
+    }
 #endif //NEOPIXEL_CHAIN
 	}
 }
@@ -880,6 +898,10 @@ int main() {
 	}
 
 	setPinModes();
+
+	gpio_init(_pinDpadToggle);
+	gpio_pull_up(_pinDpadToggle);
+	gpio_set_dir(_pinDpadToggle, GPIO_IN);
 
 	Pins pinList {//not actually necessary for any of the rp2040 read functions
 		.pinLa = 0,
