@@ -944,8 +944,6 @@ int main() {
 	gpio_set_dir(_pinProfileButton, GPIO_IN);
 	gpio_pull_up(_pinProfileButton);
 
-Pins pinList {
-
 	gpio_init(_pinDpadToggle);
 	gpio_pull_up(_pinDpadToggle);
 	gpio_set_dir(_pinDpadToggle, GPIO_IN);
