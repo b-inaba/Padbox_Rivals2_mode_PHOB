@@ -42,7 +42,7 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 	GCReport report = {{
 		.a       = _btn.A,
 		.b       = _btn.B,
-		.x       = _btn.X,
+		.x       = _rivalsProfile ? _extraBtn.LS : _btn.X,
 		.y       = _btn.Y,
 		.start   = _btn.S,
 		.pad0    = 0,
@@ -51,15 +51,15 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dDown   = _btn.Dd,
 		.dUp = _btn.Du && (_extraBtn.UP || _dpadUpUnlocked),
 		.z       = _btn.Z,
-		.r       = _rivalsProfile ? 0 : _btn.R,
-		.l       = _rivalsProfile ? (_btn.L || _btn.R) : _btn.L,
+		.r       = _btn.R,
+		.l       = _btn.L,
 		.pad1    = 1,
 		.xStick  = _btn.Ax,
 		.yStick  = _btn.Ay,
 		.cxStick = _btn.Cx,
 		.cyStick = _btn.Cy,
 		.analogL = _btn.La,
-		.analogR = _btn.Ra
+		.analogR = _rivalsProfile ? 0 : _btn.Ra
 	}};
 	return report;
 }
