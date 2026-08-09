@@ -8,12 +8,14 @@
 #include "hardware/regs/usb.h"
 #include "hardware/structs/usb.h"
 #include "hardware/resets.h"
-
+#include "hardware/watchdog.h"
+#include "hardware/structs/watchdog.h"
 #include "phobGCC.h"
 #include "comms/joybus.hpp"
 #include "cvideo.h"
 #include "cvideo_variables.h"
 #include "hardware/clocks.h"
+
 
 volatile bool _videoOut = false;
 //Variables used by PhobVision to communicate with the event loop core
@@ -23,6 +25,9 @@ int _currentCalStep = -1;//-1 means not calibrating
 int _currentRemapStep = -1;//-1 means not remapping
 bool _currentlyRaw = false;
 bool _rivalsProfile = false;
+const int _pinProfileButton = 16; // likely second menu button - test this
+const uint32_t PROFILE_REBOOT_MELEE  = 0x4D454C45; // "MELE"
+const uint32_t PROFILE_REBOOT_RIVALS = 0x52495632; // "RIV2"
 const int _pinDpadToggle = 20;
 volatile bool _dpadUpUnlocked = false;
 DataCapture _dataCapture;
@@ -97,6 +102,8 @@ void second_core() {
 #endif //NEOPIXEL_CHAIN
 
 	extrasInit();
+	bool profileButtonWasPressed = false;
+	uint64_t profileButtonHoldStart = 0;
 	bool lastDpadTogglePressed = false;
 	uint64_t lastDpadToggleTime = 0;
 
@@ -810,6 +817,40 @@ void second_core() {
 #endif //NEOPIXEL_CHAIN
 		processButtons(_pinList, _btn, _hardware, _extraBtn, _controls, _gains, _normGains, _currentCalStep, _currentRemapStep, _currentlyRaw, running, tempCalPointsX, tempCalPointsY, whichStick, notchStatus, notchAngles, measuredNotchAngles, _aStickParams, _cStickParams);
 
+		// PROFILE REBOOT BUTTON
+		bool profileButtonPressed = !gpio_get(_pinProfileButton);
+
+if(profileButtonPressed) {
+
+    // Start timing on initial press
+    if(!profileButtonWasPressed) {
+        profileButtonHoldStart = millis();
+    }
+
+    // Held for 1 second: reboot into opposite profile
+    if(millis() - profileButtonHoldStart >= 1000) {
+
+        if(_rivalsProfile) {
+            // Rivals -> Melee
+            watchdog_hw->scratch[0] = PROFILE_REBOOT_MELEE;
+        }
+        else {
+            // Melee -> Rivals
+            watchdog_hw->scratch[0] = PROFILE_REBOOT_RIVALS;
+        }
+
+        watchdog_reboot(0, 0, 0);
+
+        // Should never get here, but don't continue processing if reset
+        // somehow takes a moment.
+        while(true) {
+            tight_loop_contents();
+        }
+    }
+}
+
+profileButtonWasPressed = profileButtonPressed;
+
 // Toggle whether D-pad Up requires the K4 modifier
 bool dpadTogglePressed = !gpio_get(_pinDpadToggle);
 uint64_t now = millis();
@@ -899,6 +940,12 @@ int main() {
 
 	setPinModes();
 
+	gpio_init(_pinProfileButton);
+	gpio_set_dir(_pinProfileButton, GPIO_IN);
+	gpio_pull_up(_pinProfileButton);
+
+Pins pinList {
+
 	gpio_init(_pinDpadToggle);
 	gpio_pull_up(_pinDpadToggle);
 	gpio_set_dir(_pinDpadToggle, GPIO_IN);
@@ -978,9 +1025,24 @@ int main() {
 	//Read buttons on startup to determine what mode to begin in
 	readButtons(_pinList, _hardware, _extraBtn);
 
-	//Default = Melee
-//Hold D-pad Right while plugging in = Rivals 2 profile
-_rivalsProfile = _hardware.Dr;
+	// Check whether we just rebooted ourselves to switch profiles
+uint32_t requestedProfile = watchdog_hw->scratch[0];
+
+// Clear immediately - this is a one-shot request
+watchdog_hw->scratch[0] = 0;
+
+if(requestedProfile == PROFILE_REBOOT_RIVALS) {
+    _rivalsProfile = true;
+}
+else if(requestedProfile == PROFILE_REBOOT_MELEE) {
+    _rivalsProfile = false;
+}
+else {
+    // Normal cold boot:
+    // Default = Melee
+    // Hold D-pad Right while plugging in = Rivals 2
+    _rivalsProfile = _hardware.Dr;
+}
 
 
 if(_hardware.S) {

@@ -92,7 +92,8 @@ target_link_libraries(phobgcc_rp2040
 	hardware_sync
 	hardware_timer
 	hardware_resets
-	hardware_irq)
+	hardware_irq
+	hardware_watchdog)
 
 pico_add_extra_outputs(phobgcc_rp2040)
 pico_enable_stdio_usb(phobgcc_rp2040 0)
