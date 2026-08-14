@@ -42,8 +42,8 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 	GCReport report = {{
 		.a       = _btn.A,
 		.b       = _btn.B,
-		.x       = _rivalsProfile ? _extraBtn.LS : _btn.X,
-		.y       = _btn.Y,
+		.x = _btn.X,
+		.y = _rivalsProfile ? _extraBtn.LS : _btn.Y,
 		.start   = _btn.S,
 		.pad0    = 0,
 		.dLeft   = _btn.Dl,
