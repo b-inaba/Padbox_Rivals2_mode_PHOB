@@ -14,7 +14,7 @@ const int _pinL  = 22; //L3, left (only) trigger
 const int _pinR  = 10; // P1, top row 1
 const int _pinX  = 7;  // K2, bottom row 2
 const int _pinY  = 11; // P2, top row 2
-const int _pinZ  = 12; // P3, top row 3
+const int _pinZ  = 8;  // K3, bottom row 3
 const int _pinS  = 17; //working
 const int _pinRumble = -1;
 const int _pinBrake  = -1;
@@ -25,9 +25,9 @@ const int _pinTX  = 23; //working
 
 //Analog trigger values
 #define B0XXRIGHT
-const int _pinLS = 13; // P4, top row 4
-const int _pinMS = 8;  // K3, bottom row 3
-const int _pinUP = 9;  // K4, bottom row 4
+const int _pinLS = 9;  // K4, bottom row 4
+const int _pinMS = 12; // P3, top row 3
+const int _pinUP = 13; // P4, top row 4 - D-pad Up modifier
 
 //Permanent d-pad
 #define DPAD
