@@ -49,7 +49,7 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dLeft   = _btn.Dl,
 		.dRight  = _btn.Dr,
 		.dDown   = _btn.Dd,
-		.dUp = _btn.Du && (_extraBtn.UP || _dpadUpUnlocked),
+		.dUp = _btn.Du && (_extraBtn.UP || (_btn.A && _btn.B && _btn.X) || _dpadUpUnlocked),
 		.z       = _btn.Z,
 		.r       = _btn.R,
 		.l       = _btn.L,
