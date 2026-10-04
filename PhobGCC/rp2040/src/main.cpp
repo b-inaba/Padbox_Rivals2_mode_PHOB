@@ -56,7 +56,6 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 	const bool remappedDpadShift = _extraBtn.UP;
 	const bool remappedLS = _extraBtn.LS;
 #endif
-#endif
 	GCReport report = {{
 		.a       = _btn.A,
 		.b       = _btn.B,
