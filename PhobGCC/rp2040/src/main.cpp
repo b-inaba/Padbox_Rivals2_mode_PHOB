@@ -39,6 +39,22 @@ uint32_t _profileIndicatorStart = 0;
 
 //This gets called by the comms library
 GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
+	#ifdef B0XXRIGHT
+    const uint8_t remapSource =
+        (_extraBtn.UP ? 1 : 0) << A_REMAP |
+        (_hardware.B  ? 1 : 0) << B_REMAP |
+        (_extraBtn.MS ? 1 : 0) << D_REMAP |
+        (_extraBtn.LS ? 1 : 0) << L_REMAP |
+        (_hardware.R  ? 1 : 0) << R_REMAP |
+        (_hardware.X  ? 1 : 0) << X_REMAP |
+        (_hardware.Y  ? 1 : 0) << Y_REMAP |
+        (_hardware.Z  ? 1 : 0) << Z_REMAP;
+
+    const bool remappedDpadShift =
+        (remapSource & _controls.aRemap) != 0;
+#else
+    const bool remappedDpadShift = _extraBtn.UP;
+#endif
 	GCReport report = {{
 		.a       = _btn.A,
 		.b       = _btn.B,
@@ -49,7 +65,7 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
 		.dLeft   = _btn.Dl,
 		.dRight  = _btn.Dr,
 		.dDown   = _btn.Dd,
-		.dUp = _btn.Du && (_extraBtn.UP || (_btn.A && _btn.B && _btn.X) || _dpadUpUnlocked),
+		.dUp = _btn.Du && (_extraBtn.UP || _dpadUpUnlocked),
 		.z       = _btn.Z,
 		.r       = _btn.R,
 		.l       = _btn.L,
