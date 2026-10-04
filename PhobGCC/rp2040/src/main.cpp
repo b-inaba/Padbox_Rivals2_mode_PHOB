@@ -50,11 +50,12 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
         (_hardware.Y  ? 1 : 0) << Y_REMAP |
         (_hardware.Z  ? 1 : 0) << Z_REMAP;
 
-    const bool remappedDpadShift =
-        (remapSource & _controls.aRemap) != 0;
+	const bool remappedDpadShift =(remapSource & _controls.aRemap) != 0;
+	const bool remappedLS =(remapSource & _controls.lRemap) != 0;
 #else
-    const bool remappedDpadShift = _extraBtn.UP;
-	const bool remappedLS = (remapSource & _controls.lRemap) != 0;
+	const bool remappedDpadShift = _extraBtn.UP;
+	const bool remappedLS = _extraBtn.LS;
+#endif
 #endif
 	GCReport report = {{
 		.a       = _btn.A,
