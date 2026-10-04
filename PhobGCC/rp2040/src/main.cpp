@@ -54,12 +54,13 @@ GCReport __no_inline_not_in_flash_func(buttonsToGCReport)() {
         (remapSource & _controls.aRemap) != 0;
 #else
     const bool remappedDpadShift = _extraBtn.UP;
+	const bool remappedLS = (remapSource & _controls.lRemap) != 0;
 #endif
 	GCReport report = {{
 		.a       = _btn.A,
 		.b       = _btn.B,
 		.x = _btn.X,
-		.y = _rivalsProfile ? _extraBtn.LS : _btn.Y,
+		.y = _rivalsProfile ? remappedLS : _btn.Y,
 		.start   = _btn.S,
 		.pad0    = 0,
 		.dLeft   = _btn.Dl,
